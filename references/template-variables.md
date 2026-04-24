@@ -133,7 +133,7 @@
 | `tag.html` | config, theme_config, menus, posts, tag, current_tag, tags, now |
 | `tags.html` | config, theme_config, menus, tags, now |
 | `about.html` | config, theme_config, menus, tags, now |
-| `friends.html` | config, theme_config, menus, tags, now |
+| `links.html` | config, theme_config, menus, tags, links, now |
 | `memos.html` | config, theme_config, menus, memos, tags, now |
 | `blog.html` | config, theme_config, menus, posts, tags, pagination, now |
 | `404.html` | config, theme_config, menus, now |

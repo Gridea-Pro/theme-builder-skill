@@ -28,7 +28,7 @@ TEMPLATE_FILES = [
     "tag.html",
     "tags.html",
     "about.html",
-    "friends.html",
+    "links.html",
     "blog.html",
     "memos.html",
     "404.html",
@@ -196,16 +196,28 @@ JINJA2_TEMPLATES["about.html"] = textwrap.dedent("""\
     {% endblock %}
 """)
 
-JINJA2_TEMPLATES["friends.html"] = textwrap.dedent("""\
+JINJA2_TEMPLATES["links.html"] = textwrap.dedent("""\
     {% extends "base.html" %}
 
-    {% block body_class %}friends{% endblock %}
+    {% block body_class %}links{% endblock %}
 
     {% block content %}
-    <div class="friends-page">
+    <div class="links-page">
         <h1 class="page-title">友情链接</h1>
-        <div class="friends-list">
-            <p>暂无友情链接。</p>
+        <div class="links-list">
+            {% if links|length > 0 %}
+                {% for link in links %}
+                    <a class="link-item" href="{{ link.url }}" target="_blank" rel="noopener">
+                        {% if link.avatar %}<img src="{{ link.avatar }}" alt="{{ link.name }}" />{% endif %}
+                        <div>
+                            <div class="link-name">{{ link.name }}</div>
+                            {% if link.description %}<div class="link-desc">{{ link.description }}</div>{% endif %}
+                        </div>
+                    </a>
+                {% endfor %}
+            {% else %}
+                <p>暂无友情链接。</p>
+            {% endif %}
         </div>
     </div>
     {% endblock %}
@@ -503,14 +515,26 @@ GO_TEMPLATES["about.html"] = textwrap.dedent("""\
     {{ template "base" . }}
 """)
 
-GO_TEMPLATES["friends.html"] = textwrap.dedent("""\
-    {{ define "body_class" }}friends{{ end }}
+GO_TEMPLATES["links.html"] = textwrap.dedent("""\
+    {{ define "body_class" }}links{{ end }}
 
     {{ define "content" }}
-    <div class="friends-page">
+    <div class="links-page">
         <h1 class="page-title">友情链接</h1>
-        <div class="friends-list">
-            <p>暂无友情链接。</p>
+        <div class="links-list">
+            {{ if .Links }}
+                {{ range .Links }}
+                <a class="link-item" href="{{ .URL }}" target="_blank" rel="noopener">
+                    {{ if .Avatar }}<img src="{{ .Avatar }}" alt="{{ .Name }}" />{{ end }}
+                    <div>
+                        <div class="link-name">{{ .Name }}</div>
+                        {{ if .Description }}<div class="link-desc">{{ .Description }}</div>{{ end }}
+                    </div>
+                </a>
+                {{ end }}
+            {{ else }}
+                <p>暂无友情链接。</p>
+            {{ end }}
         </div>
     </div>
     {{ end }}
@@ -782,12 +806,24 @@ EJS_TEMPLATES["about.html"] = textwrap.dedent("""\
     </div>
 """)
 
-EJS_TEMPLATES["friends.html"] = textwrap.dedent("""\
-    <% var bodyClass = 'friends'; %>
-    <div class="friends-page">
+EJS_TEMPLATES["links.html"] = textwrap.dedent("""\
+    <% var bodyClass = 'links'; %>
+    <div class="links-page">
         <h1 class="page-title">友情链接</h1>
-        <div class="friends-list">
-            <p>暂无友情链接。</p>
+        <div class="links-list">
+            <% if (locals.links && links.length > 0) { %>
+                <% links.forEach(function(link) { %>
+                    <a class="link-item" href="<%= link.url %>" target="_blank" rel="noopener">
+                        <% if (link.avatar) { %><img src="<%= link.avatar %>" alt="<%= link.name %>" /><% } %>
+                        <div>
+                            <div class="link-name"><%= link.name %></div>
+                            <% if (link.description) { %><div class="link-desc"><%= link.description %></div><% } %>
+                        </div>
+                    </a>
+                <% }); %>
+            <% } else { %>
+                <p>暂无友情链接。</p>
+            <% } %>
         </div>
     </div>
 """)

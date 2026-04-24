@@ -222,8 +222,8 @@ def build_context(mock_data, template_name):
     elif basename == "about":
         pass  # config is enough
 
-    elif basename == "friends":
-        ctx["friends"] = mock_data.get("friends", [])
+    elif basename == "links":
+        ctx["links"] = mock_data.get("links", mock_data.get("friends", []))
 
     elif basename == "memos":
         pass  # memos already in ctx
@@ -481,7 +481,7 @@ def check_rendered_html(html, template_name):
 
     # Skip checks for partials and non-full-page templates
     full_page_templates = ["index.html", "post.html", "archives.html", "tags.html",
-                           "tag.html", "about.html", "friends.html", "blog.html",
+                           "tag.html", "about.html", "links.html", "blog.html",
                            "memos.html", "404.html"]
     basename = os.path.basename(template_name)
 

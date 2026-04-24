@@ -38,7 +38,7 @@ themes/my-theme/
 │   ├── tag.html                   # 单个标签页（该标签下的文章列表）
 │   ├── tags.html                  # 标签汇总页（所有标签）
 │   ├── about.html                 # 关于页
-│   ├── friends.html               # 友链页
+│   ├── links.html                 # 友链页
 │   ├── blog.html                  # 博客列表页（分页）
 │   ├── memos.html                 # 灵感/短想法页
 │   ├── 404.html                   # 404 错误页
@@ -78,7 +78,7 @@ themes/my-theme/
 | `templates/tag.html` | 可选 | 若不提供，单个标签页不可用 |
 | `templates/tags.html` | 可选 | 若不提供，标签汇总页不可用 |
 | `templates/about.html` | 可选 | 若不提供，关于页不可用 |
-| `templates/friends.html` | 可选 | 若不提供，友链页不可用 |
+| `templates/links.html` | 可选 | 若不提供，友链页不可用 |
 | `templates/blog.html` | 可选 | 博客列表页，支持分页，与 index.html 类似但可有不同布局 |
 | `templates/memos.html` | 可选 | 若不提供，灵感/Memo 功能不可用 |
 | `templates/404.html` | 可选 | 若不提供，使用浏览器默认 404 页面 |
@@ -130,7 +130,7 @@ Gridea Pro 构建博客时，按以下 6 个步骤执行渲染：
 4. **tag.html** → 为每个标签输出 `tag/<tag-name>/index.html`
 5. **tags.html** → 输出 `tags/index.html`
 6. **about.html** → 输出 `about/index.html`
-7. **friends.html** → 输出 `friends/index.html`
+7. **links.html** → 输出 `links/index.html`
 8. **blog.html** → 输出 `blog/index.html`（及分页）
 9. **memos.html** → 输出 `memos/index.html`
 10. **404.html** → 输出 `404.html`
@@ -222,7 +222,7 @@ Gridea Pro 支持 LESS 预处理。如果使用 `.less` 文件：
 | `tag.html` | 单个标签 | `tag-page.html` |
 | `tags.html` | 标签汇总 | `all-tags.html` |
 | `about.html` | 关于 | `about-me.html` |
-| `friends.html` | 友链 | `links.html`、`blogroll.html` |
+| `links.html` | 友链 | `friends.html`、`blogroll.html` |
 | `blog.html` | 博客列表 | `posts.html`、`list.html` |
 | `memos.html` | 灵感 | `notes.html`、`thoughts.html` |
 | `404.html` | 错误页 | `not-found.html`、`error.html` |

@@ -25,7 +25,7 @@
     {"name": "归档", "link": "/archives"},
     {"name": "标签", "link": "/tags"},
     {"name": "闪念", "link": "/memos"},
-    {"name": "友链", "link": "/friends"},
+    {"name": "友链", "link": "/links"},
     {"name": "关于", "link": "/about"}
   ],
   "posts": [
@@ -224,5 +224,21 @@
     "count": 3
   },
   "post": null,
+  "links": [
+    {
+      "id": "link-1",
+      "name": "Gridea Pro",
+      "url": "https://github.com/Gridea-Pro/gridea-pro",
+      "description": "基于 Wails 的桌面静态博客写作客户端",
+      "avatar": "https://avatars.githubusercontent.com/u/0"
+    },
+    {
+      "id": "link-2",
+      "name": "某友链示例",
+      "url": "https://example.com",
+      "description": "一个简短描述",
+      "avatar": ""
+    }
+  ],
   "now": "2026-02-28T15:30:00+08:00"
 }
