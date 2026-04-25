@@ -229,7 +229,7 @@ def build_context(mock_data, template_name):
 
     elif basename == "tag":
         ctx["current_tag"] = mock_data.get("current_tag", mock_data.get("tag", {
-            "name": "测试", "link": "/tag/test/", "count": 1,
+            "name": "测试", "slug": "test", "link": "/tag/test/", "count": 1,
         }))
         ctx["tag"] = ctx["current_tag"]
         # Filter posts to those with this tag
@@ -238,6 +238,19 @@ def build_context(mock_data, template_name):
             p for p in ctx["posts"]
             if any(t.get("name") == tag_name for t in p.get("tags", []))
         ]
+
+    elif basename == "category":
+        # 复刻 Gridea Pro 真实运行时：渲染 category.html 时 `category` 是当前分类
+        # （CategoryView { Name, Slug, Link, Count }），`posts` 是该分类下的文章；
+        # 全局 `categories` 数组在引擎里**不存在**，所以这里也不注入。
+        ctx["category"] = mock_data.get("category", {
+            "name": "示例分类", "slug": "sample", "link": "/category/sample/", "count": 1,
+        })
+        cat_name = ctx["category"].get("name", "")
+        ctx["posts"] = [
+            p for p in ctx["posts"]
+            if any(c.get("name") == cat_name for c in p.get("categories", []))
+        ] or ctx["posts"]  # 兜底：mock 里没文章带这个分类时不让模板崩
 
     elif basename in ("archives", "blog", "index"):
         # Filter out hidden posts for list pages

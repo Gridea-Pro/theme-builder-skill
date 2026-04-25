@@ -30,16 +30,36 @@
   ],
   "posts": [
     {
+      "id": "post-001",
       "title": "Gridea Pro 主题开发完全指南",
       "content": "<h2>前言</h2><p>这是一篇完整的测试文章，包含各种 Markdown 元素。</p><h3>代码块</h3><pre><code class=\"language-javascript\">console.log('Hello World');\nconst x = 42;</code></pre><h3>列表</h3><ul><li>项目一</li><li>项目二</li></ul><ol><li>有序一</li><li>有序二</li></ol><blockquote><p>这是引用文字</p></blockquote><p>包含<strong>加粗</strong>、<em>斜体</em>、<code>行内代码</code>和<a href=\"https://example.com\">链接</a>。</p><table><thead><tr><th>名称</th><th>类型</th></tr></thead><tbody><tr><td>标题</td><td>字符串</td></tr></tbody></table><p><img src=\"/post-images/test.jpg\" alt=\"测试图片\"></p><hr>",
+      "abstract": "<p>这是一篇完整的测试文章，包含各种 Markdown 元素。</p>",
+      "description": "这是一篇完整的测试文章，包含各种 Markdown 元素。",
+      "toc": "<ol><li><a href=\"#前言\">前言</a><ol><li><a href=\"#代码块\">代码块</a></li><li><a href=\"#列表\">列表</a></li></ol></li></ol>",
       "date": "2026-02-28",
       "dateFormat": "2026年02月28日",
+      "createdAt": "2026-02-28",
+      "updatedAt": "2026-02-28",
+      "updatedAtFormat": "2026年02月28日",
+      "published": true,
       "link": "/post/gridea-pro-theme-guide/",
       "tags": [
-        {"name": "教程", "link": "/tag/tutorial/", "count": 3},
-        {"name": "Gridea", "link": "/tag/gridea/", "count": 5}
+        {"name": "教程", "slug": "tutorial", "link": "/tag/tutorial/", "count": 3},
+        {"name": "Gridea", "slug": "gridea", "link": "/tag/gridea/", "count": 5}
+      ],
+      "tagsString": "教程,Gridea",
+      "categories": [
+        {"name": "前端", "slug": "frontend", "link": "/category/frontend/", "count": 2}
       ],
       "feature": "/post-images/guide-cover.jpg",
+      "stats": {"words": 1234, "minutes": 5, "text": "5 min read"},
+      "prevPost": null,
+      "nextPost": {
+        "title": "没有封面图和标签的文章",
+        "link": "/post/no-cover-no-tags/",
+        "fileName": "no-cover-no-tags",
+        "feature": ""
+      },
       "isTop": true,
       "hideInList": false,
       "fileName": "gridea-pro-theme-guide"
@@ -215,13 +235,21 @@
   },
   "tag": {
     "name": "教程",
+    "slug": "tutorial",
     "link": "/tag/tutorial/",
     "count": 3
   },
   "current_tag": {
     "name": "教程",
+    "slug": "tutorial",
     "link": "/tag/tutorial/",
     "count": 3
+  },
+  "category": {
+    "name": "前端",
+    "slug": "frontend",
+    "link": "/category/frontend/",
+    "count": 2
   },
   "post": null,
   "links": [
