@@ -172,13 +172,23 @@ def build_context(mock_data, template_name):
     Different templates need different context variables.
     """
     # Base context available to all templates
+    # 复刻 Gridea Pro jinja2_renderer.buildContext 的友链注入：
+    # 真实运行时把 customConfig.links 同时暴露为顶层 `links` 变量和 `theme_config.links`，
+    # 主题既可以写 {% for l in links %} 也可以写 {% for l in theme_config.links %}。
+    # 字段为 siteName / siteLink / description / avatar（见 backend/internal/engine/data_builder.go）。
+    links_data = mock_data.get("links", mock_data.get("friends", []))
+    theme_config = dict(mock_data.get("theme_config", {}))  # 浅拷贝，避免污染 mock_data
+    if "links" not in theme_config:
+        theme_config["links"] = links_data
+
     ctx = {
         "config": mock_data.get("config", {}),
-        "theme_config": mock_data.get("theme_config", {}),
+        "theme_config": theme_config,
         "menus": mock_data.get("menus", []),
         "tags": mock_data.get("tags", []),
         "posts": mock_data.get("posts", []),
         "memos": mock_data.get("memos", []),
+        "links": links_data,
         "pagination": mock_data.get("pagination", {"prev": "", "next": ""}),
         "now": mock_data.get("now", "2026-02-28T15:30:00+08:00"),
     }
@@ -223,7 +233,8 @@ def build_context(mock_data, template_name):
         pass  # config is enough
 
     elif basename == "links":
-        ctx["links"] = mock_data.get("links", mock_data.get("friends", []))
+        # links / theme_config.links 已在 base ctx 中注入，无需特殊处理
+        pass
 
     elif basename == "memos":
         pass  # memos already in ctx

@@ -226,16 +226,14 @@
   "post": null,
   "links": [
     {
-      "id": "link-1",
-      "name": "Gridea Pro",
-      "url": "https://github.com/Gridea-Pro/gridea-pro",
+      "siteName": "Gridea Pro",
+      "siteLink": "https://github.com/Gridea-Pro/gridea-pro",
       "description": "基于 Wails 的桌面静态博客写作客户端",
       "avatar": "https://avatars.githubusercontent.com/u/0"
     },
     {
-      "id": "link-2",
-      "name": "某友链示例",
-      "url": "https://example.com",
+      "siteName": "某友链示例",
+      "siteLink": "https://example.com",
       "description": "一个简短描述",
       "avatar": ""
     }
