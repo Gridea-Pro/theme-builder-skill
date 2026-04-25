@@ -152,12 +152,27 @@ def pongo2_to_jinja2(content):
             replace_filter,
             inner,
         )
+
+        # 处理未加引号的数字参数： |filter:123 → |filter(123)
+        def replace_numeric_filter(m):
+            return f"|{m.group(1)}({m.group(2)})"
+
+        converted = re.sub(
+            r'\|\s*(\w+)\s*:\s*(-?\d+(?:\.\d+)?)(?=\s|\||$|\})',
+            replace_numeric_filter,
+            converted,
+        )
         return f"{tag_open}{converted}{tag_close}"
 
     # Process {{ }} tags
     content = re.sub(r"\{\{(.*?)\}\}", convert_filters, content, flags=re.DOTALL)
     # Process {% %} tags
     content = re.sub(r"\{%(.*?)%\}", convert_filters, content, flags=re.DOTALL)
+
+    # Pongo2 的 {% ifchanged %} / {% endifchanged %} 是 Django 标签，Python Jinja2 不支持。
+    # 替换为 {% if true %} / {% endif %}，让测试能渲染通过（视觉上每次迭代都会输出，但渲染不报错）
+    content = re.sub(r"\{%\s*ifchanged\b.*?%\}", "{% if true %}", content)
+    content = re.sub(r"\{%\s*endifchanged\s*%\}", "{% endif %}", content)
 
     return content
 
@@ -286,6 +301,62 @@ def render_jinja2(theme_dir, templates, mock_data, output_dir):
     env.filters["safe"] = lambda value: Markup(value) if value else ""
     env.filters["length"] = lambda value: len(value) if value else 0
     env.filters["truncate"] = lambda value, length=255: str(value)[:length] if value else ""
+
+    # Gridea Pro 自定义 filter —— 测试桩，仅保证模板渲染通过
+    def _stub_excerpt(value, length="140"):
+        s = re.sub(r"<[^>]+>", "", str(value or ""))
+        n = int(str(length) or "140")
+        return s[:n]
+
+    def _stub_word_count(value):
+        s = re.sub(r"<[^>]+>", "", str(value or ""))
+        return len(s)
+
+    def _stub_reading_time(value):
+        return max(1, _stub_word_count(value) // 400)
+
+    def _stub_strip_html(value):
+        return re.sub(r"<[^>]+>", "", str(value or ""))
+
+    def _stub_relative(value):
+        return str(value or "")
+
+    def _stub_to_json(value):
+        return json.dumps(value, ensure_ascii=False)
+
+    def _stub_group_by(value, key="year"):
+        from types import SimpleNamespace
+        groups = {}
+        order = []
+        for item in (value or []):
+            if key == "year":
+                date = str(item.get("date", ""))
+                k = date[:4] if len(date) >= 4 else ""
+            else:
+                k = str(item.get(key, ""))
+            if k not in groups:
+                groups[k] = []
+                order.append(k)
+            groups[k].append(item)
+        return [SimpleNamespace(key=k, items=groups[k]) for k in order]
+
+    env.filters["excerpt"] = _stub_excerpt
+    env.filters["word_count"] = _stub_word_count
+    env.filters["reading_time"] = _stub_reading_time
+    env.filters["strip_html"] = _stub_strip_html
+    env.filters["relative"] = _stub_relative
+    env.filters["timeago"] = _stub_relative
+    env.filters["to_json"] = _stub_to_json
+    env.filters["group_by"] = _stub_group_by
+    env.filters["striptags"] = _stub_strip_html
+    env.filters["urlencode"] = lambda v: str(v or "")
+    env.filters["truncatechars"] = lambda v, n="140": str(v or "")[:int(str(n) or "140")]
+    env.filters["split"] = lambda v, sep=",": str(v or "").split(sep)
+    env.filters["join"] = lambda v, sep=",": sep.join(str(x) for x in (v or []))
+    env.filters["first"] = lambda v: (v[0] if v else "")
+    env.filters["last"] = lambda v: (v[-1] if v else "")
+    env.filters["upper"] = lambda v: str(v or "").upper()
+    env.filters["lower"] = lambda v: str(v or "").lower()
 
     results = {}
     # Templates to render (skip partials — they are included)
