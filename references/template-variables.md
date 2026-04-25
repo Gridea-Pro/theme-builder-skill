@@ -10,8 +10,9 @@
 4. [Menu 对象](#menu-对象)
 5. [Pagination 对象](#pagination-对象)
 6. [Memo 对象](#memo-对象)
-7. [各页面可用变量表](#各页面可用变量表)
-8. [三引擎语法对照表](#三引擎语法对照表)
+7. [Link 对象](#link-对象)
+8. [各页面可用变量表](#各页面可用变量表)
+9. [三引擎语法对照表](#三引擎语法对照表)
 
 ---
 
@@ -121,9 +122,59 @@
 
 ---
 
+## Link 对象
+
+友链条目对象。Gridea Pro 把全部友链**同时**暴露为两条路径，两者**指向同一份数据**：
+
+- `links` —— 顶层变量，所有页面都可用
+- `theme_config.links` —— 经由 `customConfig.links` 合并到 `theme_config` 上，所有页面都可用
+
+> ⚠️ 字段名是从 domain.Link 注入时**重命名**过的（参见 `backend/internal/engine/data_builder.go`）。模板中**不能**写 `link.name` / `link.url`，必须用下表的字段名。
+
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| `link.siteName` | string | 站点名称（来源于 `domain.Link.Name`） |
+| `link.siteLink` | string | 站点 URL（来源于 `domain.Link.Url`） |
+| `link.description` | string | 站点描述，可能为空字符串 |
+| `link.avatar` | string | 站点头像 URL，可能为空字符串 |
+
+### 友链遍历示例
+
+```jinja2
+{# 推荐写法 1：直接遍历顶层 links #}
+{% if links and links|length > 0 %}
+  {% for link in links %}
+    <a class="flink" href="{{ link.siteLink }}" target="_blank" rel="noopener">
+      {% if link.avatar %}
+        <img src="{{ link.avatar }}" alt="{{ link.siteName }}">
+      {% endif %}
+      <h4>{{ link.siteName }}</h4>
+      {% if link.description %}<p>{{ link.description }}</p>{% endif %}
+    </a>
+  {% endfor %}
+{% endif %}
+
+{# 写法 2：从 theme_config.links 取，效果完全等同 #}
+{% for link in theme_config.links %}...{% endfor %}
+```
+
+### 易错变量速查（友链专用）
+
+| 错误写法 | 正确写法 | 原因 |
+|----------|----------|------|
+| `link.name` | `link.siteName` | 注入时被重命名 |
+| `link.url` | `link.siteLink` | 注入时被重命名 |
+| `link.title` | `link.siteName` | 没有 title 字段 |
+| `link.desc` | `link.description` | 没有缩写 |
+| `link.icon` | `link.avatar` | 没有 icon 字段 |
+
+---
+
 ## 各页面可用变量表
 
 每个模板文件可访问的变量不同，在模板中使用变量前务必确认该页面是否有权访问：
+
+> 注：`links` 变量（同时暴露为 `theme_config.links`）实际上**所有页面**都能访问 —— 这是 Gridea Pro 的设计，方便你在 sidebar / footer 等公共组件里展示友链。下表只在"主要消费方"那一行特别标出。
 
 | 页面模板 | 可用变量 |
 |----------|----------|
@@ -133,7 +184,7 @@
 | `tag.html` | config, theme_config, menus, posts, tag, current_tag, tags, now |
 | `tags.html` | config, theme_config, menus, tags, now |
 | `about.html` | config, theme_config, menus, tags, now |
-| `links.html` | config, theme_config, menus, tags, links, now |
+| `links.html` | config, theme_config, menus, tags, **links**, now |
 | `memos.html` | config, theme_config, menus, memos, tags, now |
 | `blog.html` | config, theme_config, menus, posts, tags, pagination, now |
 | `404.html` | config, theme_config, menus, now |
@@ -454,6 +505,10 @@
 | `config.url` | `config.domain` | 域名字段为 `domain` |
 | `tag.slug` | `tag.link` | 标签链接字段为 `link` |
 | `tag.posts_count` | `tag.count` | 标签文章数字段为 `count` |
+| `link.name` | `link.siteName` | 友链注入时被重命名（来源 `domain.Link.Name`） |
+| `link.url` | `link.siteLink` | 友链注入时被重命名（来源 `domain.Link.Url`） |
+| `link.desc` | `link.description` | 友链描述字段为 `description`，无缩写 |
+| `link.icon` | `link.avatar` | 友链头像字段为 `avatar`，没有 `icon` |
 | `theme_config` 写成 `themeConfig` | `theme_config` | 模板中使用下划线命名 |
 | `pagination.previous` | `pagination.prev` | 上一页字段简写为 `prev` |
 | `{{ value\|default("x") }}` | `{{ value\|default:"x" }}` | Pongo2 过滤器参数用冒号 |
