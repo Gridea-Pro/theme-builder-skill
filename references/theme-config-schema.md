@@ -80,28 +80,53 @@ config.json 是主题与 Gridea Pro 之间的契约：
 
 ## 支持的配置类型
 
-> ⚠️ **GUI 设置面板只渲染以下 5 种类型**（经真实 GUI 验证）。写其他类型不会报错，但设置面板中只显示标题、**控件空白，用户无法配置**。
+> ⚠️ **只有下表中的 type 会被设置面板渲染**（逐条对照 `CustomSetting.vue` 的 v-if 分支核对）。写其他类型不会报错，但设置面板中只显示标题、**控件空白，用户无法配置**。
 
 | type 值 | 渲染的 GUI 控件 | 值类型 | 额外字段 | 说明 |
 |---------|-----------------|--------|----------|------|
-| `input` | 单行文本输入框 | string | — | 短文本：标题、链接、颜色 HEX 值等 |
+| `input` | 单行文本输入框 | string | `card` 可选 | 短文本：标题、链接等 |
+| `input` + `"card": "color"` | **取色器** | string | — | 颜色首选写法，值为 HEX（如 `#2563eb`） |
+| `input` + `"card": "post"` | 文章选择器 | string | — | 值为文章标识 |
 | `textarea` | 多行文本域 | string | — | 长文本：自定义 CSS / JS、多行文案、注入代码 |
-| `select` | 下拉选择框 | string | `options` 必需 | `options` 为 `[{"label":"显示名","value":"实际值"}]` 数组 |
-| `toggle` | 开关（Switch） | boolean | — | 值为 `true` 或 `false` |
-| `picture-upload` | 图片上传控件 | string | — | 值为图片路径字符串 |
+| `select` | 下拉选择框 | string | `options` **必需** | `options` 为 `[{"label":"显示名","value":"实际值"}]` 数组 |
+| `radio` | 单选按钮组 | string | `options` **必需** | 选项少（2–4 个）时比 `select` 直观 |
+| `toggle` / `switch` | 开关 | boolean | — | 两者等价，值为 `true` 或 `false` |
+| `markdown` | Markdown 编辑器 | string | — | 带编辑器的长文本 |
+| `picture-upload` / `picture` / `image` | 图片上传控件 | string | — | 三者等价，值为图片路径字符串 |
+| `array` | 可增删的卡片列表 | array | `arrayItems` **必需** | 见下方「数组配置」 |
+
+`card` 只在 `type: input` 上生效，合法值仅 `color` 和 `post`。
 
 ### ❌ 无效类型与替代方案
 
-以下类型**GUI 不支持**（历史文档曾错误地列为可用），请按对照表替换：
+以下类型**GUI 不支持**，请按对照表替换：
 
 | ❌ 无效 type | ✅ 替代方案 |
 |-------------|------------|
 | `boolean` | `toggle`（语义相同） |
-| `image` | `picture-upload` |
-| `color` | `input`（note 里注明 HEX 格式，如 `#10a37f`） |
+| `color` | `input` 加 `"card": "color"`，渲染真正的取色器 |
 | `code` | `textarea` |
 | `number` | `select`（枚举常用值）或 `input`；**模板中比较前必须 `\|default:N\|to_int`**（GUI 保存的值是字符串） |
-| `array` | 拆成多个 `input`（如 featured1Name / featured2Name…），或 `textarea` 每行一条 |
+
+### 数组配置
+
+`type: "array"` 渲染成一组可增删的卡片，每张卡片的字段由 `arrayItems` 定义（字段本身支持 `input` / `select` / `switch` / `picture-upload` 等）：
+
+```json
+{
+  "name": "featured",
+  "label": "推荐位",
+  "group": "首页",
+  "type": "array",
+  "value": [],
+  "arrayItems": [
+    { "name": "title", "label": "标题", "type": "input" },
+    { "name": "cover", "label": "封面", "type": "picture-upload" }
+  ]
+}
+```
+
+漏写 `arrayItems` 会渲染出空白卡片，`validate_syntax.py` 会报错拦截。
 
 ### 数字配置的完整模式
 

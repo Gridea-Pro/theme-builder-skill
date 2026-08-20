@@ -493,17 +493,42 @@ def _validate_cross_engine(theme_dir, engine):
             f"config.json 中 engine 值无效: '{config['engine']}'，应为 jinja2/go/ejs"
         ))
 
-    # --- customConfig type 白名单（GUI 只渲染这 5 种，其他类型控件空白无法配置） ---
-    VALID_CONFIG_TYPES = {"input", "textarea", "select", "toggle", "picture-upload"}
-    TYPE_SUGGESTIONS = {
-        "boolean": "toggle", "image": "picture-upload", "color": "input（note 注明 HEX）",
-        "code": "textarea", "number": "select 或 input（模板中 |default:N|to_int）",
-        "array": "多个 input 或 textarea 每行一条", "switch": "toggle", "radio": "select",
+    # --- customConfig type 白名单 ---
+    # 与设置面板 CustomSetting.vue 的 v-if 分支一一对应；不在表内的 type 只渲染标题、控件空白。
+    # config.json 经 domain.Theme.CustomConfig（[]interface{}）原样透传到前端，
+    # 故 card / options / arrayItems 等附加字段不会在后端被裁掉。
+    VALID_CONFIG_TYPES = {
+        "input", "textarea", "select", "radio", "switch", "toggle",
+        "markdown", "array", "picture-upload", "picture", "image",
     }
+    TYPE_SUGGESTIONS = {
+        "boolean": "toggle",
+        "color": 'input 并加 "card": "color"（渲染取色器）',
+        "code": "textarea",
+        "number": "select 或 input（模板中 |default:N|to_int）",
+    }
+    VALID_CARDS = {"color", "post"}
     for item in config.get("customConfig", []) or []:
         item_type = item.get("type", "")
+        card = item.get("card", "")
+        if card and card not in VALID_CARDS:
+            issues.append(Issue(
+                ERROR, "config.json", None,
+                f"customConfig '{item.get('name', '?')}' 的 card '{card}' GUI 不支持，"
+                f"仅支持 {'/'.join(sorted(VALID_CARDS))}（且只对 type: input 生效）"
+            ))
+        if item_type == "array" and not item.get("arrayItems"):
+            issues.append(Issue(
+                ERROR, "config.json", None,
+                f"customConfig '{item.get('name', '?')}' 的 type 'array' 缺少 arrayItems，面板将渲染空卡片"
+            ))
+        if item_type in ("select", "radio") and not item.get("options"):
+            issues.append(Issue(
+                ERROR, "config.json", None,
+                f"customConfig '{item.get('name', '?')}' 的 type '{item_type}' 缺少 options，控件不会渲染"
+            ))
         if item_type and item_type not in VALID_CONFIG_TYPES:
-            hint = TYPE_SUGGESTIONS.get(item_type, "input/textarea/select/toggle/picture-upload 之一")
+            hint = TYPE_SUGGESTIONS.get(item_type, "/".join(sorted(VALID_CONFIG_TYPES)) + " 之一")
             issues.append(Issue(
                 ERROR, "config.json", None,
                 f"customConfig '{item.get('name', '?')}' 的 type '{item_type}' GUI 不支持（面板控件空白），请改用 {hint}"
