@@ -1,0 +1,11 @@
+# Register the gridea-theme-builder skill provider in the DSH profile.
+#
+# Install (from any DSH workspace):
+#   dsh plugin --profile web add "github:Gridea-Pro/theme-builder-skill"
+#
+# The plugin's apply() registers a skill provider on ctx.skills;
+# tool-skill then publishes the skill to the model-facing catalog.
+
+- insert:
+    - id: gridea-theme-builder
+      name: '@gridea-pro/dsh-skill-theme-builder'
