@@ -12,8 +12,6 @@
 | `cordis.patch.yml` | bundle 模式的 patch 层（`dsh plugin add` 用） |
 | `tsconfig.json` | TypeScript 编译配置 |
 | `overlay.yml` | 本地开发 overlay 模板（`--patch` 用，需改路径） |
-| `install-dsh.sh` | 安装辅助脚本（macOS / Linux / Git Bash） |
-| `install-dsh.bat` | 安装辅助脚本（Windows CMD） |
 
 ---
 
@@ -105,14 +103,16 @@ packages:
 
 nodeLinker: hoisted
 
-# 追加以下内容（从 pnpm 报错中原样复制，不要手打）：
+# 追加以下内容（从 pnpm 报错中原样复制 key，用单引号包起来）：
 allowBuilds:
-  @gridea-pro/dsh-skill-theme-builder@git+ssh://git@github.com/xiaxi626/theme-builder-skill.git#839c3efd...: true
+  '@gridea-pro/dsh-skill-theme-builder@git+ssh://git@github.com/xiaxi626/theme-builder-skill.git#839c3efd...': true
 ```
 
 关键注意点：
 - key 包含完整的 git URL + commit SHA，**不能用简单包名替代**
 - **从 pnpm 报错中原样复制**，不要手打（SHA 很容易抄错）
+- **key 必须用单引号包起来**，因为 `@` 是 YAML 保留字符，不加引号会报 `bad indentation` 错误
+- 不要把 pnpm 报错中的注释行（`# Add the package to ...`）复制进去
 - SHA 每次推送都会变，更新插件时需要重复这个流程
 
 **第 3 步：重新安装（这次会成功）**
@@ -143,20 +143,6 @@ npx @deepseek-ai/dsh plugin --profile web add "github:xiaxi626/theme-builder-ski
 # 2. 用新的 key 更新 pnpm-workspace.yaml
 # 3. 重新 add
 npx @deepseek-ai/dsh plugin --profile web add "github:xiaxi626/theme-builder-skill#dsh"
-```
-
----
-
-## 安装辅助脚本（仅限已 clone 仓库时使用）
-
-`install-dsh.sh` / `install-dsh.bat` 不是独立的安装方式，它只是把上面"从 GitHub 安装"的三步自动化了（自动提取 pnpm 报错中的 `allowBuilds` key）。只有你 clone 了仓库才能拿到脚本，所以本质上只适合开发者自己验证安装流程。
-
-```bash
-# macOS / Linux / Git Bash
-bash install-dsh.sh
-
-# Windows CMD
-install-dsh.bat
 ```
 
 ---
