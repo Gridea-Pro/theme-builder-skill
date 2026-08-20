@@ -6,6 +6,13 @@
 
 ### Fixed / Changed
 
+**2026-08-20 · customConfig type 白名单对齐真实 GUI（修复 CI 长期红灯）**
+
+- **`type: "color"` 不存在，取色器是 `type: "input"` + `"card": "color"`**：`scaffold_theme.py` 生成的 `config.json` 用了 `type: "color"`，被 `validate_syntax.py` 判为非法 —— 脚手架的产物通不过自己的校验器，CI 三个引擎自 2026-07-09 起全红。现改为 `input` + `card: "color"`，用户拿到的是真正的取色器而不是纯文本框；三个 starter 的 `primaryColor` 同步跟进。
+- **校验白名单漏了 6 种 GUI 实际支持的类型**：逐条对照 `CustomSetting.vue` 的 v-if 分支核对后，`radio`、`switch`、`markdown`、`array`、`picture`、`image` 均可正常渲染，此前被误判为非法并给出错误的替代建议。白名单与 `theme-config-schema.md` 的类型表一并重写。
+- **新增三条 config.json 校验**：`card` 只允许 `color` / `post`；`type: array` 缺 `arrayItems` 报错（否则面板渲染空卡片）；`select` / `radio` 缺 `options` 报错（否则控件不渲染）。
+- **文档补充数组配置写法**：`theme-config-schema.md` 增加 `arrayItems` 的完整示例。
+
 **2026-07-08 · 基于 chatgpt 主题实战（真实引擎渲染）的修正与增强**
 
 - **修正 `post.date` 类型描述（推翻上一轮"修正"）**：Jinja2 / EJS 渲染上下文经 `json.Marshal` 构建，`post.date` / `updatedAt` / `createdAt` 是 **RFC3339 字符串**；仅 Go Templates 直接传 struct 才是 `time.Time`。Jinja2 中对这些字段用 `|date:` 会报错并使整页降级（实战中曾导致首页 + 全部文章页降级）。`template-variables.md` / `jinja2-guide.md`（差异 8 重写）/ `SKILL.md` 规则 6 三处对齐，并给出正确用法：`dateFormat` / `|relative` / 直接输出 / `|slice`。
