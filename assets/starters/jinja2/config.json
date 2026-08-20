@@ -11,6 +11,7 @@
       "group": "外观设置",
       "value": "#2563eb",
       "type": "input",
+      "card": "color",
       "note": "主题主色调，用于链接和强调色"
     },
     {

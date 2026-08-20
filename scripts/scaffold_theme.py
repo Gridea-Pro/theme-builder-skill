@@ -1428,9 +1428,10 @@ def build_config(theme_name, engine, author):
                 "name": "primaryColor",
                 "label": "主色调",
                 "group": "样式",
-                "type": "color",
+                "type": "input",
+                "card": "color",
                 "value": "#2563eb",
-                "note": "主题的主要颜色"
+                "note": "主题的主要颜色（HEX，如 #2563eb）"
             },
             {
                 "name": "showFeatureImage",
