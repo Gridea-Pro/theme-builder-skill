@@ -2,9 +2,6 @@
   "name": "@gridea-pro/dsh-skill-theme-builder",
   "description": "Gridea Pro theme builder skill for DeepSeek Harness",
   "version": "0.1.0",
-  "publishConfig": {
-    "access": "public"
-  },
   "type": "module",
   "main": "lib/index.js",
   "types": "lib/types/index.d.ts",
@@ -32,8 +29,7 @@
     }
   },
   "scripts": {
-    "build": "tsc -p tsconfig.json",
-    "prepare": "tsc -p tsconfig.json"
+    "build": "tsc -p tsconfig.json"
   },
   "peerDependencies": {
     "@deepseek-ai/dsh-skill": ">=0.0.1-rc.0",

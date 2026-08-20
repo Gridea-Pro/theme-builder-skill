@@ -27,3 +27,7 @@ themes/
 # 本地示例/草稿(如需提交 examples/,请从 .gitignore 中移除对应路径)
 scratch/
 tmp/
+
+# Node.js
+node_modules/
+npm-debug.log*

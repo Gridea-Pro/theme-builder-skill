@@ -70,56 +70,13 @@ npx @deepseek-ai/dsh web
 
 其他用户不需要 clone 仓库，通过 `dsh plugin add` 直接从 GitHub 拉取安装。
 
-> **注意**：由于 pnpm ≥10 的安全策略，从 GitHub 安装**一定会经历"首次失败 → 手动授权 → 重新安装"三步**，这是 pnpm 的设计，不是 bug。如果觉得麻烦，请作者发布到 npm（见末尾说明）。
-
 ### 安装
 
-**第 1 步：首次安装（预期会失败）**
-
 ```bash
-npx @deepseek-ai/dsh plugin --profile web add "github:xiaxi626/theme-builder-skill#dsh"
+npx @deepseek-ai/dsh plugin --profile web add "github:Gridea-Pro/theme-builder-skill"
 ```
 
-会看到类似报错：
-
-```
-[ERR_PNPM_GIT_DEP_PREPARE_NOT_ALLOWED] ...
-allowBuilds:
-  @gridea-pro/dsh-skill-theme-builder@git+ssh://git@github.com/xiaxi626/theme-builder-skill.git#839c3efd...: true
-```
-
-这是正常的——pnpm 拒绝运行 git 依赖的构建脚本，需要你手动授权。
-
-**第 2 步：写入构建授权**
-
-打开 `~/.dsh/profiles/web/pnpm-workspace.yaml`（Windows: `C:\Users\你的用户名\.dsh\profiles\web\pnpm-workspace.yaml`）。
-
-这个文件已有基础内容，**不要删原有内容**，在文件末尾追加 pnpm 报错中打印的那两行：
-
-```yaml
-# 原有内容保持不变：
-packages:
-  - .
-
-nodeLinker: hoisted
-
-# 追加以下内容（从 pnpm 报错中原样复制 key，用单引号包起来）：
-allowBuilds:
-  '@gridea-pro/dsh-skill-theme-builder@git+ssh://git@github.com/xiaxi626/theme-builder-skill.git#839c3efd...': true
-```
-
-关键注意点：
-- key 包含完整的 git URL + commit SHA，**不能用简单包名替代**
-- **从 pnpm 报错中原样复制**，不要手打（SHA 很容易抄错）
-- **key 必须用单引号包起来**，因为 `@` 是 YAML 保留字符，不加引号会报 `bad indentation` 错误
-- 不要把 pnpm 报错中的注释行（`# Add the package to ...`）复制进去
-- SHA 每次推送都会变，更新插件时需要重复这个流程
-
-**第 3 步：重新安装（这次会成功）**
-
-```bash
-npx @deepseek-ai/dsh plugin --profile web add "github:xiaxi626/theme-builder-skill#dsh"
-```
+> `package.json` 没有 `prepare` 脚本，pnpm 不会触发构建授权，安装一步到位。编译产物 `lib/` 已提交在仓库中。
 
 ### 启动
 
@@ -133,16 +90,10 @@ npx @deepseek-ai/dsh web
 npx @deepseek-ai/dsh plugin --profile web remove @gridea-pro/dsh-skill-theme-builder
 ```
 
-卸载后建议手动清理 `pnpm-workspace.yaml` 中的 `allowBuilds` 条目（原有内容保留）。
-
 ### 更新
 
 ```bash
-# 1. 先删掉旧的 allowBuilds 条目，重新 add 触发报错获取新 SHA
-npx @deepseek-ai/dsh plugin --profile web add "github:xiaxi626/theme-builder-skill#dsh"
-# 2. 用新的 key 更新 pnpm-workspace.yaml
-# 3. 重新 add
-npx @deepseek-ai/dsh plugin --profile web add "github:xiaxi626/theme-builder-skill#dsh"
+npx @deepseek-ai/dsh plugin --profile web update @gridea-pro/dsh-skill-theme-builder
 ```
 
 ---
@@ -153,8 +104,8 @@ npx @deepseek-ai/dsh plugin --profile web add "github:xiaxi626/theme-builder-ski
 |---|---|---|
 | 适用场景 | 开发调试 | 分发给用户 |
 | 需要本地克隆 | 是 | 否 |
-| 需要编译 | 否（tsx 直接跑 .ts） | 是（pnpm 运行 `prepare`） |
-| 需要构建授权 | 否 | 是（`allowBuilds`） |
+| 需要编译 | 否（tsx 直接跑 .ts） | 否（`lib/` 已提交） |
+| 需要构建授权 | 否 | 否 |
 | 路径硬编码 | 是（每台机器不同） | 否 |
 | 改代码后生效 | 重启即生效 | 需 `plugin update` |
 | 卸载方式 | 不带 `--patch` 重启 | `plugin remove` |
@@ -193,20 +144,26 @@ npx @deepseek-ai/dsh plugin --profile web add "github:xiaxi626/theme-builder-ski
 
 **解决**：`npm install` 确保安装了 `@types/node`（已在 `devDependencies` 中声明）。
 
-### `ERR_PNPM_GIT_DEP_PREPARE_NOT_ALLOWED`
+---
 
-**原因**：pnpm ≥10 默认拒绝运行 git 依赖的 `prepare` 脚本。
+## 开发者须知
 
-**解决**：按上方"从 GitHub 安装"的三步流程操作——首次失败是正常的，将 pnpm 报错中打印的完整 `allowBuilds` key（含 git URL + commit SHA）追加到 `~/.dsh/profiles/web/pnpm-workspace.yaml`，然后重新 `add`。
+### 修改 `src/index.ts` 后同步 `lib/`
 
-> 注意：key 不能用简单包名，必须用 pnpm 打印的完整格式，且 commit SHA 每次推送都会变。
+本项目没有 `prepare` 脚本（去掉它是为了让 GitHub 安装不需要 pnpm 构建授权）。因此修改 `src/index.ts` 后必须手动编译并提交 `lib/`：
 
-### 安装失败后清理
+```bash
+npm run build
+git add lib/ src/index.ts
+git commit -m "feat: update plugin code"
+```
 
-首次 `add` 失败**不会留下残余**——pnpm 在构建授权通过之前不会写入任何依赖。如果试图 `remove` 会看到 `ERR_PNPM_CANNOT_REMOVE_MISSING_DEPS`，这是正常的，说明 profile 是干净的，无需额外清理。
+CI 会检查 `lib/` 与 `src/` 是否同步（`check-lib-sync` job）。如果忘了编译，CI 会红灯。
 
-`~/.dsh/profiles/web/pnpm-workspace.yaml` 中的原有内容（`packages`、`nodeLinker`）是 DSH profile 自带的基础配置，**不要删**。只需追加或清理 `allowBuilds` 条目。
+### 包管理器说明
 
-### `plugin update` 失效
+本项目使用 **npm** 管理依赖（`package-lock.json` + `npm ci`）。DSH 的 `plugin add` 底层使用 pnpm 从 GitHub 拉取，但 pnpm 读的是 `package.json`，不关心仓库的 lock 文件格式——`package-lock.json` 对 pnpm 透明，会被忽略。因此两者不冲突，用户也不需要安装 pnpm。
 
-GitHub 安装方式下，`plugin update` 可能因 SHA 变化导致授权失效。解决方式：手动删掉 `pnpm-workspace.yaml` 中的旧 `allowBuilds` 条目，重新走"add → 报错 → 写新 key → add"流程。
+### `description` 自动从 SKILL.md 提取
+
+`src/index.ts` 的 `get()` 方法会运行时从 `SKILL.md` frontmatter 解析 `description` 字段，不需要在代码中维护两份。`list()` 使用一个简短的 fallback 描述，仅用于初始目录展示；模型实际获取 skill 时调用 `get()`，拿到的是 SKILL.md 中的完整描述。

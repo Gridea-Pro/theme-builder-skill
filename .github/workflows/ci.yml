@@ -35,3 +35,24 @@ jobs:
       - name: Render test
         run: python scripts/render_test.py ./_ci_themes/ci-smoke --output-dir ./_ci_output
         if: matrix.engine == 'jinja2'
+
+  check-lib-sync:
+    name: Check lib/ is in sync with src/
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: "20"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Compile TypeScript
+        run: npx tsc -p tsconfig.json
+
+      - name: Verify lib/ matches committed output
+        run: git diff --exit-code lib/
