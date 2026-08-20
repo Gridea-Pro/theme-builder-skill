@@ -12,8 +12,8 @@
 | `cordis.patch.yml` | bundle 模式的 patch 层（`dsh plugin add` 用） |
 | `tsconfig.json` | TypeScript 编译配置 |
 | `overlay.yml` | 本地开发 overlay 模板（`--patch` 用，需改路径） |
-| `install-dsh.sh` | 安装脚本（macOS / Linux / Git Bash） |
-| `install-dsh.bat` | 安装脚本（Windows CMD） |
+| `install-dsh.sh` | 安装辅助脚本（macOS / Linux / Git Bash） |
+| `install-dsh.bat` | 安装辅助脚本（Windows CMD） |
 
 ---
 
@@ -68,42 +68,56 @@ npx @deepseek-ai/dsh web
 
 ---
 
-## 从 GitHub 安装（分发给别人用）
+## 从 GitHub 安装（给其他用户用）
 
-适合最终用户，安装后无需每次带 `--patch` 参数。
+其他用户不需要 clone 仓库，通过 `dsh plugin add` 直接从 GitHub 拉取安装。
 
-### 一键安装（推荐）
+> **注意**：由于 pnpm ≥10 的安全策略，从 GitHub 安装**一定会经历"首次失败 → 手动授权 → 重新安装"三步**，这是 pnpm 的设计，不是 bug。如果觉得麻烦，请作者发布到 npm（见末尾说明）。
+
+### 安装
+
+**第 1 步：首次安装（预期会失败）**
 
 ```bash
-# macOS / Linux / Git Bash
-bash install-dsh.sh
-
-# Windows CMD
-install-dsh.bat
+npx @deepseek-ai/dsh plugin --profile web add "github:xiaxi626/theme-builder-skill#dsh"
 ```
 
-脚本自动完成两阶段安装：
-1. 首次 `add` 触发 pnpm 构建授权报错，从中提取精确的 `allowBuilds` key（含 git URL + commit SHA）
-2. 将 key 写入 `~/.dsh/profiles/web/pnpm-workspace.yaml`，然后重新 `add` 完成安装
+会看到类似报错：
 
-### 手动安装
+```
+[ERR_PNPM_GIT_DEP_PREPARE_NOT_ALLOWED] ...
+allowBuilds:
+  @gridea-pro/dsh-skill-theme-builder@git+ssh://git@github.com/xiaxi626/theme-builder-skill.git#839c3efd...: true
+```
 
-如果不使用脚本，需手动执行三步：
+这是正常的——pnpm 拒绝运行 git 依赖的构建脚本，需要你手动授权。
+
+**第 2 步：写入构建授权**
+
+打开 `~/.dsh/profiles/web/pnpm-workspace.yaml`（Windows: `C:\Users\你的用户名\.dsh\profiles\web\pnpm-workspace.yaml`）。
+
+这个文件已有基础内容，**不要删原有内容**，在文件末尾追加 pnpm 报错中打印的那两行：
+
+```yaml
+# 原有内容保持不变：
+packages:
+  - .
+
+nodeLinker: hoisted
+
+# 追加以下内容（从 pnpm 报错中原样复制，不要手打）：
+allowBuilds:
+  @gridea-pro/dsh-skill-theme-builder@git+ssh://git@github.com/xiaxi626/theme-builder-skill.git#839c3efd...: true
+```
+
+关键注意点：
+- key 包含完整的 git URL + commit SHA，**不能用简单包名替代**
+- **从 pnpm 报错中原样复制**，不要手打（SHA 很容易抄错）
+- SHA 每次推送都会变，更新插件时需要重复这个流程
+
+**第 3 步：重新安装（这次会成功）**
 
 ```bash
-# 1. 安装（首次会因构建授权失败，这是预期的）
-npx @deepseek-ai/dsh plugin --profile web add "github:xiaxi626/theme-builder-skill#dsh"
-
-# 2. 查看报错信息中 pnpm 打印的 allowBuilds 行，形如：
-#    allowBuilds:
-#      @gridea-pro/dsh-skill-theme-builder@git+ssh://git@github.com/xiaxi626/theme-builder-skill.git#<SHA>: true
-#
-#    将该行原样写入 ~/.dsh/profiles/web/pnpm-workspace.yaml
-#
-#    注意：key 包含完整的 git URL + commit SHA，不能用简单包名替代，
-#    且 SHA 每次推送都会变。
-
-# 3. 重新安装
 npx @deepseek-ai/dsh plugin --profile web add "github:xiaxi626/theme-builder-skill#dsh"
 ```
 
@@ -119,10 +133,30 @@ npx @deepseek-ai/dsh web
 npx @deepseek-ai/dsh plugin --profile web remove @gridea-pro/dsh-skill-theme-builder
 ```
 
+卸载后建议手动清理 `pnpm-workspace.yaml` 中的 `allowBuilds` 条目（原有内容保留）。
+
 ### 更新
 
 ```bash
-npx @deepseek-ai/dsh plugin --profile web update @gridea-pro/dsh-skill-theme-builder
+# 1. 先删掉旧的 allowBuilds 条目，重新 add 触发报错获取新 SHA
+npx @deepseek-ai/dsh plugin --profile web add "github:xiaxi626/theme-builder-skill#dsh"
+# 2. 用新的 key 更新 pnpm-workspace.yaml
+# 3. 重新 add
+npx @deepseek-ai/dsh plugin --profile web add "github:xiaxi626/theme-builder-skill#dsh"
+```
+
+---
+
+## 安装辅助脚本（仅限已 clone 仓库时使用）
+
+`install-dsh.sh` / `install-dsh.bat` 不是独立的安装方式，它只是把上面"从 GitHub 安装"的三步自动化了（自动提取 pnpm 报错中的 `allowBuilds` key）。只有你 clone 了仓库才能拿到脚本，所以本质上只适合开发者自己验证安装流程。
+
+```bash
+# macOS / Linux / Git Bash
+bash install-dsh.sh
+
+# Windows CMD
+install-dsh.bat
 ```
 
 ---
@@ -177,6 +211,16 @@ npx @deepseek-ai/dsh plugin --profile web update @gridea-pro/dsh-skill-theme-bui
 
 **原因**：pnpm ≥10 默认拒绝运行 git 依赖的 `prepare` 脚本。
 
-**解决**：使用 `install-dsh.sh` / `install-dsh.bat` 脚本自动处理；或手动将 pnpm 报错中打印的完整 `allowBuilds` key（含 git URL + commit SHA）写入 `~/.dsh/profiles/web/pnpm-workspace.yaml`。
+**解决**：按上方"从 GitHub 安装"的三步流程操作——首次失败是正常的，将 pnpm 报错中打印的完整 `allowBuilds` key（含 git URL + commit SHA）追加到 `~/.dsh/profiles/web/pnpm-workspace.yaml`，然后重新 `add`。
 
 > 注意：key 不能用简单包名，必须用 pnpm 打印的完整格式，且 commit SHA 每次推送都会变。
+
+### 安装失败后清理
+
+首次 `add` 失败**不会留下残余**——pnpm 在构建授权通过之前不会写入任何依赖。如果试图 `remove` 会看到 `ERR_PNPM_CANNOT_REMOVE_MISSING_DEPS`，这是正常的，说明 profile 是干净的，无需额外清理。
+
+`~/.dsh/profiles/web/pnpm-workspace.yaml` 中的原有内容（`packages`、`nodeLinker`）是 DSH profile 自带的基础配置，**不要删**。只需追加或清理 `allowBuilds` 条目。
+
+### `plugin update` 失效
+
+GitHub 安装方式下，`plugin update` 可能因 SHA 变化导致授权失效。解决方式：手动删掉 `pnpm-workspace.yaml` 中的旧 `allowBuilds` 条目，重新走"add → 报错 → 写新 key → add"流程。
