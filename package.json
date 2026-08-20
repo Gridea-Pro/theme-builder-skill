@@ -40,6 +40,9 @@
     "@deepseek-ai/cordis": ">=0.0.1-rc.0"
   },
   "devDependencies": {
-    "typescript": "^5.5.0"
+    "typescript": "^5.5.0",
+    "@types/node": "^20.14.0",
+    "@deepseek-ai/dsh-skill": ">=0.0.1-rc.0",
+    "@deepseek-ai/cordis": ">=0.0.1-rc.0"
   }
 }
