@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  <a href="LICENSE"><img src="https://img.shields.io/badge/License-GPL%20v3.0-blue.svg" alt="License"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License"></a>
   <img src="https://img.shields.io/badge/AI%20Agent-Skill-8A2BE2.svg" alt="AI Agent Skill">
   <img src="https://img.shields.io/badge/Engines-Jinja2%20%7C%20Go%20%7C%20EJS-4FC08D.svg" alt="Template Engines">
   <img src="https://img.shields.io/badge/Python-3.8+-3776AB.svg?logo=python&logoColor=white" alt="Python">
@@ -117,4 +117,8 @@ pip install -r requirements.txt  # 仅需 jinja2
 
 ## 许可
 
-[GPL-3.0](LICENSE),跟随 [Gridea Pro](https://github.com/Gridea-Pro/gridea-pro) 主项目。
+[MIT](LICENSE)。
+
+本仓库是主题开发的配套工具与模板，用宽松协议发布，你用 `scaffold_theme.py` 生成的主题归你所有，可以按任意协议发布、也可以闭源商用。
+
+[Gridea Pro](https://github.com/Gridea-Pro/gridea-pro) 主项目仍为 GPL-3.0，两者互不影响。

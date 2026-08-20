@@ -6,6 +6,11 @@
 
 ### Fixed / Changed
 
+**2026-08-20 · 开源协议由 GPL-3.0 改为 MIT**
+
+- 本仓库是主题开发的配套工具与模板（提示词、参考文档、Python 脚本、starter 模板），不是产品本体。GPL 的传染性会让用户用 `scaffold_theme.py` 生成的主题也被迫开源，这与本 Skill "降低做主题门槛"的目的相悖。改为 MIT 后，生成的主题归作者所有，可闭源商用。
+- Gridea Pro 主项目仍为 GPL-3.0，不受影响。
+- 变更范围：`LICENSE` 全文替换、README 徽章与「许可」章节。仓库全部 commit 均由单一作者贡献，无需第三方授权。
 **2026-08-20 · customConfig type 白名单对齐真实 GUI（修复 CI 长期红灯）**
 
 - **`type: "color"` 不存在，取色器是 `type: "input"` + `"card": "color"`**：`scaffold_theme.py` 生成的 `config.json` 用了 `type: "color"`，被 `validate_syntax.py` 判为非法 —— 脚手架的产物通不过自己的校验器，CI 三个引擎自 2026-07-09 起全红。现改为 `input` + `card: "color"`，用户拿到的是真正的取色器而不是纯文本框；三个 starter 的 `primaryColor` 同步跟进。
