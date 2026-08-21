@@ -8,8 +8,8 @@
  *
  * Pattern follows the official @deepseek-ai/dsh-skill-badge plugin:
  *   - registerProvider() with a static SkillProvider
- *   - list() returns a pre-built candidate (description read lazily in get())
- *   - get() reads SKILL.md at call time (body and description picked up dynamically)
+ *   - list() and get() both read SKILL.md at call time, so edits to the
+ *     frontmatter description and to the body are picked up without a rebuild
  *
  * @module @gridea-pro/dsh-skill-theme-builder
  */
