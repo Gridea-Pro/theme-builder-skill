@@ -1,0 +1,20 @@
+# 本地开发 overlay —— 用 --patch 把插件源码直接插入 Web UI
+#
+# 用法：
+#   1. 复制本文件为 overlay.yml（不要改原文件，或改了也行）
+#   2. 把下面 name 改成你机器上 src/index.ts 的绝对路径
+#   3. 运行：
+#
+#      Windows:  npx @deepseek-ai/dsh web --patch D:/path/to/overlay.yml
+#      macOS:    npx @deepseek-ai/dsh web --patch /Users/you/path/to/overlay.yml
+#      Linux:    npx @deepseek-ai/dsh web --patch /home/you/path/to/overlay.yml
+#
+# name 格式：
+#   Windows:  file:///D:/theme-builder-skill/src/index.ts   （需要 file:// 前缀）
+#   macOS:    /Users/you/theme-builder-skill/src/index.ts   （裸路径即可）
+#   Linux:    /home/you/theme-builder-skill/src/index.ts    （裸路径即可）
+#
+# 首次使用前需在项目目录运行 npm install 安装依赖。
+- insert:
+    - id: gridea-theme-builder
+      name: 'REPLACE_WITH_ABSOLUTE_PATH_TO_SRC/index.ts'

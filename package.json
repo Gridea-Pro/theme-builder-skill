@@ -1,0 +1,44 @@
+{
+  "name": "@gridea-pro/dsh-skill-theme-builder",
+  "description": "Gridea Pro theme builder skill for DeepSeek Harness",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "lib/index.js",
+  "types": "lib/types/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./lib/types/index.d.ts",
+      "default": "./lib/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "lib/index.js",
+    "lib/types/index.d.ts",
+    "SKILL.md",
+    "references",
+    "scripts",
+    "assets",
+    "requirements.txt",
+    "cordis.patch.yml"
+  ],
+  "license": "MIT",
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json"
+  },
+  "peerDependencies": {
+    "@deepseek-ai/dsh-skill": ">=0.0.1-rc.0",
+    "@deepseek-ai/cordis": ">=0.0.1-rc.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.0",
+    "@types/node": "^20.14.0",
+    "@deepseek-ai/dsh-skill": ">=0.0.1-rc.0",
+    "@deepseek-ai/cordis": ">=0.0.1-rc.0"
+  }
+}

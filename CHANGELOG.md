@@ -4,6 +4,17 @@
 
 ## [Unreleased]
 
+### Added
+
+**2026-08-20 · DSH (DeepSeek Harness) 插件支持**
+
+- 新增 `src/index.ts`：基于官方 `skill-badge` 模式，通过 `ctx.skills.registerProvider()` 注册 `gridea-theme-builder` skill provider，`resourceBase` 指向 bundle 根目录，模型可解析 `references/`、`scripts/`、`assets/` 的相对路径。
+- `description` 运行时从 `SKILL.md` frontmatter 自动提取，无需在代码中维护两份。
+- 新增 `package.json`、`tsconfig.json`、`cordis.patch.yml`、`overlay.yml` 等插件配置文件。
+- 新增 `src/README.md`：DSH 插件安装、测试、卸载的完整文档。
+- CI 新增 `check-lib-sync` job：检查 `lib/` 编译产物与 `src/` 源码是否同步。
+- 原有 Claude Skill 用法不受影响，所有 Skill 内容文件未改动。
+
 ### Fixed / Changed
 
 **2026-08-20 · 开源协议由 GPL-3.0 改为 MIT**

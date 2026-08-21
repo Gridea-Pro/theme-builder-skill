@@ -109,6 +109,10 @@ CustomConfig 用 index 访问,跑通 validate 和 render 测试。
 
 > `CLAUDE.md` 是 Claude Code 专属的元指令文件,其他 Agent 与人类用户可忽略。
 
+## 作为 DSH 插件使用
+
+本 Skill 也可作为 [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) 插件运行,安装方式和说明详见 [src/README.md](src/README.md)。
+
 ## 开发环境
 
 ```bash
